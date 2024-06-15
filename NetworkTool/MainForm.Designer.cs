@@ -63,6 +63,8 @@ partial class MainForm
         // 
         // MainForm
         // 
+        AutoSize = true;
+        AutoSizeMode = AutoSizeMode.GrowAndShrink;
         ClientSize = new Size(882, 374);
         Controls.Add(pictureBoxNetworkStatus);
         Controls.Add(textBoxDetails);
