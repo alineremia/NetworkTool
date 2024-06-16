@@ -5,13 +5,14 @@ namespace NetworkTool;
 
 public partial class MainForm : Form
 {
-    private readonly NetworkToolManager _networkToolManager;
+    private readonly INetworkToolManager _networkToolManager;
     private Timer? _networkCheckTimer;
 
-    public MainForm()
+    public MainForm(INetworkToolManager networkToolManager)
     {
+        _networkToolManager = networkToolManager;
         InitializeComponent();
-        _networkToolManager = new NetworkToolManager();
+
         InitializeTimer();
         LoadNetworkAdapters();
         UpdateNetworkAvailability();

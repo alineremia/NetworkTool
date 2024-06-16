@@ -10,7 +10,10 @@ public class NetworkToolManagerTests
     [SetUp]
     public void Setup()
     {
-        _networkToolManager = new NetworkToolManager();
+        _networkToolManager = new NetworkToolManager(
+            new NetworkInterfaceService(),
+            new NetworkDetailsFormatter()
+        );
     }
 
     [Test]

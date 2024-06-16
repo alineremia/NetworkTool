@@ -1,3 +1,5 @@
+using Autofac;
+
 namespace NetworkTool;
 
 internal static class Program
@@ -5,7 +7,9 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        ApplicationConfiguration.Initialize();
-        Application.Run(new MainForm());
+        var container = DependencyInjectionConfig.Configure();
+        using var scope = container.BeginLifetimeScope();
+        var mainForm = scope.Resolve<MainForm>();
+        Application.Run(mainForm);
     }
 }
