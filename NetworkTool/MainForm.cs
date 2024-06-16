@@ -1,15 +1,18 @@
 ﻿using NetworkConfigLibrary;
+using Timer = System.Windows.Forms.Timer;
 
 namespace NetworkTool;
 
 public partial class MainForm : Form
 {
     private readonly NetworkToolManager _networkToolManager;
+    private Timer? _networkCheckTimer;
 
     public MainForm()
     {
         InitializeComponent();
         _networkToolManager = new NetworkToolManager();
+        InitializeTimer();
         LoadNetworkAdapters();
         UpdateNetworkAvailability();
     }
@@ -24,38 +27,57 @@ public partial class MainForm : Form
         }
     }
 
-    private void UpdateNetworkAvailability()
+    private void InitializeTimer()
     {
-        pictureBoxNetworkStatus.BackColor = _networkToolManager.IsNetworkAvailable()
-            ? Color.Green
-            : Color.Red;
+        _networkCheckTimer = new Timer();
+        _networkCheckTimer.Interval = 100;
+        _networkCheckTimer.Tick += NetworkCheckTimer_Tick;
+        _networkCheckTimer.Start();
+    }
+
+    private void NetworkCheckTimer_Tick(object? sender, EventArgs e)
+    {
+        UpdateNetworkAvailability();
+    }
+
+    private bool UpdateNetworkAvailability()
+    {
+        if (CheckNetworkAndPrompt())
+        {
+            pictureBoxNetworkStatus.BackColor = Color.Green;
+            return true;
+        }
+
+        pictureBoxNetworkStatus.BackColor = Color.Red;
+        return false;
     }
 
     private void DisplayNetworkConfiguration(string adapterName)
     {
-        var details = _networkToolManager.GetNetworkConfiguration(adapterName);
-        textBoxDetails.Text = details;
+        textBoxDetails.Clear();
+        textBoxDetails.Text = _networkToolManager.GetNetworkConfiguration(adapterName);
     }
 
-    private void CheckNetworkAndPrompt()
+    private bool CheckNetworkAndPrompt()
     {
-        if (!_networkToolManager.IsNetworkAvailable())
-        {
-            textBoxDetails.Text =
-                @"The network is not available. Please connect and click the refresh button";
-        }
+        if (_networkToolManager.IsNetworkAvailable())
+            return true;
+        textBoxDetails.Text =
+            @"The network is not available. Please connect and click the refresh button";
+        return false;
     }
 
     private void buttonRefresh_Click(object sender, EventArgs e)
     {
-        CheckNetworkAndPrompt();
+        if (!UpdateNetworkAvailability())
+            return;
         LoadNetworkAdapters();
-        UpdateNetworkAvailability();
     }
 
     private void listBoxAdapters_SelectedIndexChanged(object sender, EventArgs e)
     {
-        CheckNetworkAndPrompt();
+        if (!UpdateNetworkAvailability())
+            return;
         var selectedAdapter = listBoxAdapters.SelectedItem?.ToString();
         if (selectedAdapter is not null)
             DisplayNetworkConfiguration(selectedAdapter);
