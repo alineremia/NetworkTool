@@ -8,6 +8,7 @@ public class NetworkDetailsFormatter : INetworkDetailsFormatter
     {
         var details = $"Adapter Name: {adapter?.Name}\n";
         details += $"Status: {adapter?.OperationalStatus}\n";
+        details += $"Adapter Type: {adapter?.NetworkInterfaceType}\n";
 
         if (adapter?.OperationalStatus == OperationalStatus.Up)
         {
@@ -25,17 +26,17 @@ public class NetworkDetailsFormatter : INetworkDetailsFormatter
     private static string FormatIpProperties(IPInterfaceProperties ipProperties)
     {
         var details = string.Empty;
-        var ipv4 = ipProperties.UnicastAddresses.First(ip =>
+        var ipv4 = ipProperties.UnicastAddresses.FirstOrDefault(ip =>
             ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
         );
-        var ipv6 = ipProperties.UnicastAddresses.First(ip =>
+        var ipv6 = ipProperties.UnicastAddresses.FirstOrDefault(ip =>
             ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6
         );
 
-        details += $"IPv4 Address: {ipv4.Address}\n";
-        details += $"IPv4 Subnet Mask: {ipv4.IPv4Mask}\n";
+        details += $"IPv4 Address: {ipv4?.Address}\n";
+        details += $"IPv4 Subnet Mask: {ipv4?.IPv4Mask}\n";
 
-        details += $"IPv6 Address: {ipv6.Address}\n";
+        details += $"IPv6 Address: {ipv6?.Address}\n";
 
         var gatewayAddresses = ipProperties.GatewayAddresses.Select(g => g.Address).ToList();
         if (gatewayAddresses.Count > 0)
