@@ -16,12 +16,15 @@ public class NetworkToolManager
 
     public string GetNetworkConfiguration(string adapterName)
     {
-        return FormatAdapterDetails(GetAdapterByName(adapterName));
+        var adapter = GetAdapterByName(adapterName);
+        return adapter is null
+            ? $"Error: Adapter '{adapterName}' not found."
+            : FormatAdapterDetails(adapter);
     }
 
     private NetworkInterface? GetAdapterByName(string adapterName)
     {
-        return GetAllNetworkAdapters().First(a => a.Name == adapterName);
+        return GetAllNetworkAdapters().FirstOrDefault(a => a.Name == adapterName);
     }
 
     private static string FormatAdapterDetails(NetworkInterface? adapter)
